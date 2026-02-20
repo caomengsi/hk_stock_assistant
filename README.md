@@ -94,3 +94,19 @@ npm run dev
 
 - 后端仅使用公开 Go 模块（如 `github.com/cloudwego/hertz`、`github.com/cloudwego/kitex`），未使用任何内部/私有依赖。
 - 前端依赖来自 npm 公共仓库。
+
+## 首次推送到 GitHub（方式 A：HTTPS + Token）
+
+仓库已建好且本地已 commit 后，在本机终端执行（将 `YOUR_GITHUB_TOKEN` 换成你在 GitHub 生成的 Personal Access Token）：
+
+```bash
+cd /Users/bytedance/Downloads/stoce_assistant-main/hk_stock_assistant
+git remote set-url origin https://YOUR_GITHUB_TOKEN@github.com/caomengsi/hk_stock_assistant.git
+git push -u origin main
+```
+
+推送成功后，建议把远程地址改回不含 Token 的地址，避免泄露：
+
+```bash
+git remote set-url origin https://github.com/caomengsi/hk_stock_assistant.git
+```

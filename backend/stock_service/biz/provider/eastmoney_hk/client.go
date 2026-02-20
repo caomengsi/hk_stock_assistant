@@ -126,3 +126,47 @@ func (c *Client) GetStockInfo(ctx context.Context, code string) (*stock.StockInf
 		Timestamp:     "",
 	}, nil
 }
+
+// indexPush2Data 全球指数 push2 返回（secid=100.HSI 等），价格与涨跌为 *100
+type indexPush2Data struct {
+	F43  int64  `json:"f43"`  // 最新价 * 100
+	F58  string `json:"f58"`  // 名称
+	F60  int64  `json:"f60"`  // 昨收 * 100
+	F169 int64  `json:"f169"` // 涨跌额 * 100
+	F170 int64  `json:"f170"` // 涨跌幅 * 100（如 -0.82 表示 -0.82%）
+}
+
+// GetIndexInfo 获取全球指数（如恒生 100.HSI），与东方财富行情页一致
+func (c *Client) GetIndexInfo(ctx context.Context, secID string) (name string, value, change, changePercent float64, err error) {
+	fields := "f43,f58,f60,f169,f170"
+	url := fmt.Sprintf("%s?secid=%s&fields=%s&ut=fa5fd1943c7b386f172d6893dbfba10b", push2URL, secID, fields)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return "", 0, 0, 0, err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return "", 0, 0, 0, err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", 0, 0, 0, err
+	}
+	var r struct {
+		Data *indexPush2Data `json:"data"`
+	}
+	if err := json.Unmarshal(body, &r); err != nil || r.Data == nil {
+		return "", 0, 0, 0, fmt.Errorf("invalid index response")
+	}
+	d := r.Data
+	name = d.F58
+	if name == "" {
+		name = "恒生指数"
+	}
+	value = float64(d.F43) / 100
+	change = float64(d.F169) / 100
+	changePercent = float64(d.F170) / 100
+	return name, value, change, changePercent, nil
+}

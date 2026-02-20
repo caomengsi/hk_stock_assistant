@@ -197,12 +197,163 @@
 }
 
 .index-value {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
+  color: #111;
+  margin-bottom: 0.25rem;
 }
 
 .index-change {
   font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.sector-section {
+  margin-top: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  margin: 0 0 1rem;
+  color: #333;
+}
+
+.sector-subtitle {
+  font-size: 0.95rem;
+  margin: 0 0 0.75rem;
+  color: #1E88E5;
+}
+
+.sector-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.sector-tab {
+  position: relative;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  border: none;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.sector-tab:hover {
+  color: #333;
+}
+
+.sector-tab.active {
+  color: #1E88E5;
+  font-weight: 500;
+  border-bottom-color: #1E88E5;
+}
+
+.sector-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sector-list-sm {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.sector-tab-panel {
+  height: 420px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sector-tab-panel .sector-list-fixed {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.sector-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.5rem;
+  padding: 0;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 0.5rem;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.sector-row:last-child {
+  border-bottom: none;
+}
+
+.sector-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sector-code {
+  margin-left: 0.35rem;
+  font-size: 0.85em;
+  color: var(--text-secondary, #666);
+}
+
+.sector-value {
+  min-width: 4.5rem;
+  text-align: right;
+  color: var(--text-secondary, #666);
+  font-variant-numeric: tabular-nums;
+  margin-right: 0.75rem;
+}
+
+.sector-row-capital-block {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sector-row-capital-block:last-child {
+  border-bottom: none;
+}
+
+.sector-row-capital-line1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2rem;
+  gap: 0.5rem;
+}
+
+.sector-row-capital-line2 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-left: 0.25rem;
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.sector-row-capital-block .capital-flow-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 3.5rem;
+  margin-left: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sector-row-capital-block .capital-flow-label {
+  font-size: 0.8rem;
+  color: #666;
 }
 
 .prediction-form {
@@ -210,6 +361,72 @@
   gap: 0.75rem;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+}
+
+/* 个股预测页：表单项一行，选择框统一样式 */
+.prediction-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.prediction-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  cursor: default;
+}
+
+.prediction-field-label {
+  font-size: 0.9rem;
+  color: #555;
+  white-space: nowrap;
+}
+
+.prediction-input,
+.prediction-select {
+  height: 36px;
+  padding: 0 10px;
+  font-size: 0.9rem;
+  color: #333;
+  background: #fff;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.prediction-input {
+  width: 120px;
+  min-width: 120px;
+}
+
+.prediction-input::placeholder {
+  color: #999;
+}
+
+.prediction-input:focus,
+.prediction-select:focus {
+  border-color: #1E88E5;
+  box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.15);
+}
+
+.prediction-select {
+  min-width: 140px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+.prediction-btn {
+  margin-top: 0.25rem;
 }
 
 .input {
@@ -270,7 +487,55 @@
   white-space: pre-wrap;
 }
 
-/* 预测页 Markdown 展示（实时输出 + 总结） */
+/* 预测页：流式进行中的实时分析区域 */
+.prediction-stream-area {
+  max-height: calc(100vh - 260px);
+  min-height: 320px;
+  overflow: auto;
+}
+
+/* 预测页：结果面板与上方选择框面板的间距 */
+.prediction-result-card {
+  margin-top: 1.25rem;
+}
+
+/* 预测页：结果两个 Tab（走势分析 / 实时分析） */
+.prediction-result-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.prediction-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  border: none;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.prediction-tab:hover {
+  color: #333;
+}
+
+.prediction-tab.active {
+  color: #1E88E5;
+  font-weight: 500;
+  border-bottom-color: #1E88E5;
+}
+
+.prediction-tab-panel {
+  max-height: calc(100vh - 260px);
+  min-height: 320px;
+  overflow: auto;
+}
+
+/* 预测页 Markdown 展示（实时分析 + 总结） */
 .markdown-stream,
 .markdown-content {
   word-break: break-word;

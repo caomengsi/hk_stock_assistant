@@ -352,8 +352,9 @@ func (p *Predictor) buildPromptForLLM(ctx context.Context, code string, days int
 	return prompt, model, nil
 }
 
-// StreamPredict 流式调用 LLM，每收到一段内容就调用 onChunk(delta)；智谱/OpenAI 兼容 stream 格式。
-func (p *Predictor) StreamPredict(ctx context.Context, code string, days int32, modelOverride string, onChunk func(string) error) error {
+// StreamPredict 流式调用 LLM，每收到一段内容就调用 onChunk(eventType, delta)。
+// eventType 为 "reasoning"（思考过程）或 "content"（最终输出）；智谱/OpenAI 兼容 stream 格式。
+func (p *Predictor) StreamPredict(ctx context.Context, code string, days int32, modelOverride string, onChunk func(eventType string, text string) error) error {
 	prompt, model, err := p.buildPromptForLLM(ctx, code, days, modelOverride)
 	if err != nil {
 		return err
@@ -418,12 +419,13 @@ func (p *Predictor) StreamPredict(ctx context.Context, code string, days int32, 
 			continue
 		}
 		delta := chunk.Choices[0].Delta
-		text := delta.Content
-		if text == "" && delta.ReasoningContent != "" {
-			text = delta.ReasoningContent
+		if delta.ReasoningContent != "" && onChunk != nil {
+			if err := onChunk("reasoning", delta.ReasoningContent); err != nil {
+				return err
+			}
 		}
-		if text != "" && onChunk != nil {
-			if err := onChunk(text); err != nil {
+		if delta.Content != "" && onChunk != nil {
+			if err := onChunk("content", delta.Content); err != nil {
 				return err
 			}
 		}

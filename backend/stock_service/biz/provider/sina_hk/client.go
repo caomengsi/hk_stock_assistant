@@ -138,25 +138,26 @@ func (c *Client) GetStockInfo(ctx context.Context, code string) (*stock.StockInf
 	}, nil
 }
 
-// GetIndexInfo fetches index data (e.g. int_hangseng for Hang Seng Index)
-func (c *Client) GetIndexInfo(ctx context.Context, listCode string) (name string, value, changePercent float64, err error) {
+// GetIndexInfo fetches index data (e.g. int_hangseng for Hang Seng Index).
+// 新浪国际指数返回：名称, 数值, 变化绝对值, 变化百分比
+func (c *Client) GetIndexInfo(ctx context.Context, listCode string) (name string, value, change, changePercent float64, err error) {
 	url := fmt.Sprintf("http://hq.sinajs.cn/list=%s", listCode)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return "", 0, 0, err
+		return "", 0, 0, 0, err
 	}
 	req.Header.Set("Referer", "https://finance.sina.com.cn/")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", 0, 0, err
+		return "", 0, 0, 0, err
 	}
 	defer resp.Body.Close()
 
 	rawBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", 0, 0, err
+		return "", 0, 0, 0, err
 	}
 
 	var content string
@@ -169,7 +170,7 @@ func (c *Client) GetIndexInfo(ctx context.Context, listCode string) (name string
 	}
 
 	if !strings.Contains(content, "=\"") {
-		return "", 0, 0, fmt.Errorf("invalid response")
+		return "", 0, 0, 0, fmt.Errorf("invalid response")
 	}
 	parts := strings.Split(content, "=\"")
 	dataStr := strings.TrimSuffix(strings.TrimSuffix(parts[1], "\";"), "\"")
@@ -177,11 +178,13 @@ func (c *Client) GetIndexInfo(ctx context.Context, listCode string) (name string
 	for i := range fields {
 		fields[i] = strings.TrimSpace(fields[i])
 	}
-	if len(fields) < 3 {
-		return "", 0, 0, fmt.Errorf("not enough fields")
+	// 国际指数：0=名称 1=数值 2=变化绝对值 3=变化百分比
+	if len(fields) < 4 {
+		return "", 0, 0, 0, fmt.Errorf("not enough fields (need 4, got %d)", len(fields))
 	}
 	name = fields[0]
 	value, _ = strconv.ParseFloat(fields[1], 64)
-	changePercent, _ = strconv.ParseFloat(fields[2], 64)
-	return name, value, changePercent, nil
+	change, _ = strconv.ParseFloat(fields[2], 64)
+	changePercent, _ = strconv.ParseFloat(fields[3], 64)
+	return name, value, change, changePercent, nil
 }

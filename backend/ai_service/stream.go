@@ -66,8 +66,8 @@ func handleStream(p *predictor.Predictor, w http.ResponseWriter, r *http.Request
 		writeSSE(w, flusher, "error", "predictor not initialized")
 		return
 	}
-	err := p.StreamPredict(r.Context(), code, days, modelOverride, func(chunk string) error {
-		return writeSSE(w, flusher, "content", chunk)
+	err := p.StreamPredict(r.Context(), code, days, modelOverride, func(eventType string, chunk string) error {
+		return writeSSE(w, flusher, eventType, chunk)
 	})
 	if err != nil {
 		writeSSE(w, flusher, "error", err.Error())

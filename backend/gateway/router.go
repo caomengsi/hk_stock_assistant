@@ -16,6 +16,7 @@ func register(r *server.Hertz) {
 	apiGroup := r.Group("/api")
 	apiGroup.GET("/stocks/:code/realtime", api.GetRealtime)
 	apiGroup.GET("/market/summary", api.GetMarketSummary)
+	apiGroup.GET("/market/sectors", api.GetSectors)
 	apiGroup.POST("/prediction/:code", api.GetPrediction)
 	apiGroup.POST("/prediction/:code/stream", api.GetPredictionStream)
 }

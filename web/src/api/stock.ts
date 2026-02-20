@@ -4,6 +4,7 @@ import type {
   MarketSummaryResponse,
   PredictionResponse,
   PredictionRequest,
+  SectorsResponse,
 } from '../types'
 
 function normalizeCode(code: string): string {
@@ -30,6 +31,11 @@ export async function getMarketSummary(): Promise<MarketSummaryResponse> {
   return data
 }
 
+export async function getSectors(): Promise<SectorsResponse> {
+  const { data } = await client.get<SectorsResponse>('/api/market/sectors')
+  return data
+}
+
 export async function getPrediction(req: PredictionRequest): Promise<PredictionResponse> {
   const code = normalizeCode(req.code)
   const { data } = await client.post<PredictionResponse>(
@@ -40,11 +46,11 @@ export async function getPrediction(req: PredictionRequest): Promise<PredictionR
   return data
 }
 
-/** 流式预测：通过 SSE 逐段接收分析内容。onChunk(片段)、onDone()、onError(错误信息) */
+/** 流式预测：通过 SSE 逐段接收分析内容。onChunk(event, 片段)，event 为 'reasoning'（思考过程）或 'content'（最终输出）。 */
 export function getPredictionStream(
   req: PredictionRequest,
   callbacks: {
-    onChunk: (text: string) => void
+    onChunk: (event: 'reasoning' | 'content', text: string) => void
     onDone: () => void
     onError: (message: string) => void
   }
@@ -90,12 +96,12 @@ export function getPredictionStream(
               if (line.startsWith('event: ')) event = line.slice(7).trim()
               else if (line.startsWith('data: ')) data = line.slice(6)
             }
-            if (event === 'content') {
+            if (event === 'reasoning' || event === 'content') {
               try {
                 const s = JSON.parse(data) as string
-                callbacks.onChunk(s)
+                callbacks.onChunk(event as 'reasoning' | 'content', s)
               } catch {
-                callbacks.onChunk(data)
+                callbacks.onChunk(event as 'reasoning' | 'content', data)
               }
             } else if (event === 'error') {
               try {
@@ -118,11 +124,11 @@ export function getPredictionStream(
             if (line.startsWith('event: ')) event = line.slice(7).trim()
             else if (line.startsWith('data: ')) data = line.slice(6)
           }
-          if (event === 'content') {
+          if (event === 'reasoning' || event === 'content') {
             try {
-              callbacks.onChunk(JSON.parse(data) as string)
+              callbacks.onChunk(event as 'reasoning' | 'content', JSON.parse(data) as string)
             } catch {
-              callbacks.onChunk(data)
+              callbacks.onChunk(event as 'reasoning' | 'content', data)
             }
           }
         }

@@ -31,3 +31,19 @@ export interface PredictionRequest {
   include_news: boolean
   model: string
 }
+
+export interface SectorItem {
+  code: string
+  name: string
+  value: number
+  change_percent: number
+  main_net_inflow: number
+  main_net_ratio: number
+  retail_net_inflow?: number
+}
+
+export interface SectorsResponse {
+  hot: SectorItem[]
+  by_change: SectorItem[]
+  by_capital: SectorItem[]
+}

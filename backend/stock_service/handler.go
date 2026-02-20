@@ -36,17 +36,29 @@ func (s *StockServiceImpl) GetRealtime(ctx context.Context, req *stock.GetRealti
 	return &stock.GetRealtimeResponse{Stock: info}, nil
 }
 
-// GetMarketSummary implements stock.StockService（指数仍用新浪）
+// GetMarketSummary implements stock.StockService（恒生指数 + 恒生科技指数，优先东方财富）
 func (s *StockServiceImpl) GetMarketSummary(ctx context.Context, req *stock.GetMarketSummaryRequest) (*stock.GetMarketSummaryResponse, error) {
 	indices := make([]*stock.MarketIndex, 0)
-	// Hang Seng Index
-	name, value, changePct, err := s.indexClient.GetIndexInfo(ctx, "int_hangseng")
+	// 恒生指数：优先东方财富 100.HSI，失败则新浪 int_hangseng
+	name, value, change, changePct, err := s.stockClient.GetIndexInfo(ctx, "100.HSI")
+	if err != nil {
+		name, value, change, changePct, err = s.indexClient.GetIndexInfo(ctx, "int_hangseng")
+	}
 	if err == nil {
 		indices = append(indices, &stock.MarketIndex{
 			Name:          name,
 			Value:         value,
-			Change:        value * changePct / 100,
+			Change:        change,
 			ChangePercent: changePct,
+		})
+	}
+	// 恒生科技指数：东方财富 124.HSTECH
+	if name2, value2, change2, changePct2, err2 := s.stockClient.GetIndexInfo(ctx, "124.HSTECH"); err2 == nil {
+		indices = append(indices, &stock.MarketIndex{
+			Name:          name2,
+			Value:         value2,
+			Change:        change2,
+			ChangePercent: changePct2,
 		})
 	}
 	if len(indices) == 0 {

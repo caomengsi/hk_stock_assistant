@@ -4,23 +4,9 @@ import ReactMarkdown from 'react-markdown'
 import { getPredictionStream } from '../api/stock'
 import type { PredictionRequest } from '../types'
 
-/** 流式结束后仅展示：从「时间与大盘环境」开始到结尾的总结内容 */
-function extractSummary(fullText: string): string {
-  const trimmed = fullText.trim()
-  if (!trimmed) return trimmed
-  const markers = ['时间与大盘环境分析', '时间与大盘环境', '1. 时间与大盘环境']
-  for (const marker of markers) {
-    const idx = trimmed.indexOf(marker)
-    if (idx !== -1) {
-      return trimmed.slice(idx).trim()
-    }
-  }
-  return trimmed
-}
-
 const MODEL_OPTIONS = [
-  { value: 'glm-5', label: 'GLM-5' },
   { value: 'GLM-4.7-Flash', label: 'GLM-4.7-Flash' },
+  { value: 'glm-5', label: 'GLM-5' },
 ] as const
 
 export default function Prediction() {
@@ -30,9 +16,12 @@ export default function Prediction() {
   const [days, setDays] = useState(3)
   const [model, setModel] = useState<string>(MODEL_OPTIONS[0].value)
   const [streamingText, setStreamingText] = useState('')
-  const [summary, setSummary] = useState('')
+  const [finalOutput, setFinalOutput] = useState('')
+  const [fullStreamedText, setFullStreamedText] = useState('')
+  const [resultTab, setResultTab] = useState<'summary' | 'stream'>('summary')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const contentRef = useRef('')
   const fullTextRef = useRef('')
   const streamContainerRef = useRef<HTMLDivElement>(null)
 
@@ -40,7 +29,7 @@ export default function Prediction() {
     if (codeFromQuery) setCode(codeFromQuery)
   }, [codeFromQuery])
 
-  // 实时输出区域超出时自动滚到底部
+  // 实时分析区域超出时自动滚到底部
   useEffect(() => {
     const el = streamContainerRef.current
     if (el && streamingText) el.scrollTop = el.scrollHeight
@@ -48,8 +37,10 @@ export default function Prediction() {
 
   const runStream = useCallback(() => {
     setError('')
-    setSummary('')
+    setFinalOutput('')
+    setFullStreamedText('')
     setStreamingText('')
+    contentRef.current = ''
     fullTextRef.current = ''
     setLoading(true)
     const req: PredictionRequest = {
@@ -59,14 +50,17 @@ export default function Prediction() {
       model,
     }
     const cancel = getPredictionStream(req, {
-      onChunk(t) {
+      onChunk(event, t) {
         fullTextRef.current += t
         setStreamingText(fullTextRef.current)
+        if (event === 'content') {
+          contentRef.current += t
+        }
       },
       onDone() {
         setLoading(false)
-        const s = extractSummary(fullTextRef.current)
-        setSummary(s)
+        setFinalOutput(contentRef.current)
+        setFullStreamedText(fullTextRef.current)
         setStreamingText('')
       },
       onError(msg) {
@@ -95,20 +89,20 @@ export default function Prediction() {
         <h1>个股预测</h1>
       </header>
       <div className="card">
-        <div style={{ marginBottom: 12 }}>
-          <label>
-            股票代码
+        <div className="prediction-form-row">
+          <label className="prediction-field">
+            <span className="prediction-field-label">股票代码</span>
             <input
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="hk02513"
-              style={{ marginLeft: 8, width: 120 }}
+              className="prediction-input"
             />
           </label>
-          <label style={{ marginLeft: 16 }}>
-            预测天数
-            <select value={days} onChange={(e) => setDays(Number(e.target.value))}>
+          <label className="prediction-field">
+            <span className="prediction-field-label">预测天数</span>
+            <select value={days} onChange={(e) => setDays(Number(e.target.value))} className="prediction-select">
               {[1, 3, 5, 7].map((d) => (
                 <option key={d} value={d}>
                   {d} 天
@@ -116,9 +110,9 @@ export default function Prediction() {
               ))}
             </select>
           </label>
-          <label style={{ marginLeft: 16 }}>
-            模型
-            <select value={model} onChange={(e) => setModel(e.target.value)}>
+          <label className="prediction-field">
+            <span className="prediction-field-label">模型</span>
+            <select value={model} onChange={(e) => setModel(e.target.value)} className="prediction-select">
               {MODEL_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -127,7 +121,7 @@ export default function Prediction() {
             </select>
           </label>
         </div>
-        <button type="button" onClick={handleStart} disabled={loading} className="btn primary">
+        <button type="button" onClick={handleStart} disabled={loading} className="btn primary prediction-btn">
           {loading ? '生成中…' : '开始预测'}
         </button>
       </div>
@@ -136,24 +130,44 @@ export default function Prediction() {
           {error}
         </div>
       )}
-      {streamingText && (
-        <div className="card">
-          <h3>实时输出</h3>
-          <div
-            ref={streamContainerRef}
-            className="markdown-stream"
-            style={{ maxHeight: 300, overflow: 'auto' }}
-          >
-            <ReactMarkdown>{streamingText}</ReactMarkdown>
+      {((loading && streamingText) || (!loading && (finalOutput || fullStreamedText))) && (
+        <div className="card prediction-result-card">
+          <div className="prediction-result-tabs">
+            {!loading && (
+              <button
+                type="button"
+                className={`prediction-tab ${resultTab === 'summary' ? 'active' : ''}`}
+                onClick={() => setResultTab('summary')}
+              >
+                总结走势
+              </button>
+            )}
+            <button
+              type="button"
+              className={`prediction-tab ${loading || resultTab === 'stream' ? 'active' : ''}`}
+              onClick={() => !loading && setResultTab('stream')}
+            >
+              实时分析
+            </button>
           </div>
-        </div>
-      )}
-      {summary && (
-        <div className="card">
-          <h3>时间与大盘环境分析 · 总结</h3>
-          <div className="markdown-content">
-            <ReactMarkdown>{summary}</ReactMarkdown>
-          </div>
+          {loading && (
+            <div
+              ref={streamContainerRef}
+              className="markdown-stream prediction-tab-panel"
+            >
+              <ReactMarkdown>{streamingText}</ReactMarkdown>
+            </div>
+          )}
+          {!loading && resultTab === 'summary' && (
+            <div className="markdown-content prediction-tab-panel">
+              <ReactMarkdown>{finalOutput.trim() || '—'}</ReactMarkdown>
+            </div>
+          )}
+          {!loading && resultTab === 'stream' && (
+            <div className="markdown-stream prediction-tab-panel">
+              <ReactMarkdown>{fullStreamedText.trim() || '—'}</ReactMarkdown>
+            </div>
+          )}
         </div>
       )}
     </div>
