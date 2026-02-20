@@ -1,0 +1,7 @@
+go 1.21
+
+use (
+	./backend/gateway
+	./backend/stock_service
+	./backend/ai_service
+)

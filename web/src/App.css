@@ -1,0 +1,334 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav {
+  background: #1E88E5;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.main {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page {
+  text-align: left;
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #333;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn.primary {
+  background: #1E88E5;
+  color: #fff;
+  border-color: #1E88E5;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid #eee;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stock-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+  text-decoration: none;
+}
+
+.stock-name:hover {
+  color: #1E88E5;
+}
+
+.stock-code {
+  font-size: 0.8rem;
+  color: #757575;
+  margin-top: 2px;
+}
+
+.price-block {
+  text-align: right;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: block;
+}
+
+.change {
+  font-size: 0.9rem;
+}
+
+.card-meta {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #757575;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #1E88E5;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.8rem;
+}
+
+.muted {
+  color: #757575;
+  margin: 1rem 0;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  min-width: 280px;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.index-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.index-card {
+  text-align: center;
+}
+
+.index-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.index-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.index-change {
+  font-size: 0.9rem;
+}
+
+.prediction-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.input {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.error {
+  color: #F44336;
+  margin: 0.5rem 0;
+}
+
+.result-card h3 {
+  margin-top: 0;
+}
+
+.result-code {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.confidence {
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #1E88E5;
+  border-radius: 4px;
+}
+
+.result-card section {
+  margin-top: 1rem;
+}
+
+.result-card h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+  color: #1E88E5;
+}
+
+.analysis, .news {
+  margin: 0;
+  line-height: 1.6;
+  color: #424242;
+  white-space: pre-wrap;
+}
+
+/* 预测页 Markdown 展示（实时输出 + 总结） */
+.markdown-stream,
+.markdown-content {
+  word-break: break-word;
+  line-height: 1.6;
+  color: #333;
+}
+.markdown-stream p,
+.markdown-content p {
+  margin: 0 0 0.75em;
+}
+.markdown-stream p:last-child,
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+.markdown-stream h1,
+.markdown-content h1 { font-size: 1.25rem; margin: 1em 0 0.5em; }
+.markdown-stream h2,
+.markdown-content h2 { font-size: 1.1rem; margin: 0.9em 0 0.4em; }
+.markdown-stream h3,
+.markdown-content h3 { font-size: 1rem; margin: 0.8em 0 0.35em; }
+.markdown-stream ul,
+.markdown-content ul { margin: 0.5em 0; padding-left: 1.5em; }
+.markdown-stream ol,
+.markdown-content ol { margin: 0.5em 0; padding-left: 1.5em; }
+.markdown-stream li,
+.markdown-content li { margin: 0.25em 0; }
+.markdown-stream code,
+.markdown-content code {
+  background: #f5f5f5;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.markdown-stream pre,
+.markdown-content pre {
+  background: #f5f5f5;
+  padding: 0.75rem;
+  border-radius: 6px;
+  overflow: auto;
+  margin: 0.5em 0;
+}
+.markdown-stream pre code,
+.markdown-content pre code {
+  background: none;
+  padding: 0;
+}
+.markdown-stream strong,
+.markdown-content strong { font-weight: 600; }
+.markdown-stream blockquote,
+.markdown-content blockquote {
+  margin: 0.5em 0;
+  padding-left: 1em;
+  border-left: 3px solid #ccc;
+  color: #555;
+}
+.markdown-stream hr,
+.markdown-content hr { margin: 1em 0; border: none; border-top: 1px solid #eee; }
+.markdown-stream > *:first-child,
+.markdown-content > *:first-child { margin-top: 0; }
+.markdown-stream > *:last-child,
+.markdown-content > *:last-child { margin-bottom: 0; }
